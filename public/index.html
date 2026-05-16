@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NURU Bags — Inventory Login</title>
+  <meta name="description" content="NURU Bags internal inventory management system login." />
+  <link rel="stylesheet" href="style.css?v=202605022" />
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="brand">NURU<span>.</span></div>
+        <p>Inventory Management</p>
+      </div>
+
+      <h2>Welcome back</h2>
+      <p class="subtitle">Sign in to your account</p>
+
+      <div class="login-error" id="loginError"></div>
+
+      <form id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <div class="pw-wrap">
+            <input type="password" id="password" name="password" placeholder="Enter your password" required autocomplete="current-password" />
+            <button type="button" class="pw-toggle" aria-label="Toggle password visibility" onclick="togglePw('password', this)" tabindex="-1">
+              <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            </button>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Sign In</button>
+      </form>
+
+      <p style="text-align:center; margin-top:22px; font-size:14px; color:var(--muted);">
+        Don't have an account?
+        <a href="register.html" style="color:var(--accent); font-weight:600; text-decoration:none;">Create one →</a>
+      </p>
+      <p style="text-align:center; margin-top:8px; font-size:12px;">
+        <a href="setup-admin.html" style="color:var(--muted); text-decoration:none;">Forgot Admin account?</a>
+      </p>
+    </div>
+  </div>
+  <script src="app.js?v=202605021"></script>
+  <script>
+    initTheme();
+    initLoginPage();
+  </script>
+</body>
+</html>

@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NURU Bags — Inventory Dashboard</title>
+  <meta name="description" content="NURU Bags internal inventory management dashboard." />
+  <link rel="stylesheet" href="style.css?v=202605022" />
+</head>
+<body>
+
+<div class="app-layout">
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar">
+    <div class="sidebar-brand" style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div class="brand-name">NURU<span>.</span></div>
+        <div class="brand-sub">Inventory System</div>
+      </div>
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+        <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+
+      <div class="nav-item" data-page="overview" onclick="navigateTo('overview')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        Overview
+      </div>
+
+      <div class="nav-item" data-page="products" onclick="navigateTo('products')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        Products
+      </div>
+
+      <div class="nav-section-label">Manufacturing</div>
+      
+      <div class="nav-item" data-page="production" onclick="navigateTo('production')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        Production
+      </div>
+
+      <div class="nav-item" data-page="inventory" onclick="navigateTo('inventory')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        Material List
+        <span class="nav-badge" id="alertBadge" style="display:none">0</span>
+      </div>
+
+
+      
+      <div class="nav-item" data-page="trims" onclick="navigateTo('trims')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-4.879-4.879l-4.242-4.242m4.242 4.242L11.293 17m2.828-2.828l2.828-2.828m-7.071 7.071L7.05 16.95m7.071-7.071L9.172 4.929M4.929 9.172l4.243 4.243m0 0L4.93 17.657"/></svg>
+        Trims
+      </div>
+      
+      <div class="nav-item" data-page="fabrics" onclick="navigateTo('fabrics')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
+        Fabrics
+      </div>
+
+      <div class="nav-section-label">Data</div>
+
+      <div class="nav-item" data-page="reports" onclick="navigateTo('reports')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        Reports
+      </div>
+
+      <div class="nav-item admin-only" data-page="seclog" onclick="navigateTo('seclog')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+        Log
+      </div>
+
+      <!-- Admin only -->
+      <div class="nav-section-label admin-only">Admin</div>
+
+      <div class="nav-item admin-only" data-page="users" onclick="navigateTo('users')">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        Users
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatarText">A</div>
+        <div class="user-details">
+          <div class="user-name" id="userName">—</div>
+          <div class="user-role" id="userRole">—</div>
+        </div>
+      </div>
+      <button class="nav-item" id="logoutBtn" style="width:100%; border:none; cursor:pointer; background:none;">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+        Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <div class="main-content">
+
+    <!-- SESSION TIMEOUT WARNING BANNER -->
+    <div class="session-warn-banner hidden" id="sessionWarnBanner"></div>
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1 id="topbarTitle">Overview</h1>
+        <p id="topbarSub">NURU Bags · Inventory Management</p>
+      </div>
+      <div class="topbar-actions" style="display:flex; align-items:center; gap:16px;">
+        <button id="themeToggleBtn" class="btn btn-secondary btn-sm" aria-label="Toggle Dark Mode" style="border:none; background:transparent;">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+        <span style="font-size:13px; color:var(--muted);" id="topbarDate"></span>
+      </div>
+    </div>
+
+    <!-- ===== DASHBOARD / OVERVIEW ===== -->
+    <div class="page active" id="page-overview" style="max-width:900px; margin: 0 auto; padding-top:16px;">
+      <h2 style="margin-bottom:24px; color:var(--text);">Dashboard Overview</h2>
+      
+      <!-- 4. Low Stock Alerts (Redesigned) -->
+      <div id="do-low-container" class="low-stock-container" style="display:none; margin-bottom: 24px; overflow-x:auto; display:flex; gap:16px; padding-bottom:8px;">
+        <!-- Populated by JS -->
+      </div>
+
+      <!-- 1. Product Overview -->
+      <div class="dash-accordion" id="acc-products">
+        <div class="dash-accordion-header" onclick="toggleDashboardAccordion('acc-products')">
+          <div class="dash-accordion-title">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            Product Overview
+          </div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span class="dash-accordion-stat" id="do-prod-total">—</span>
+            <svg class="dash-accordion-chevron" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </div>
+        <div class="dash-accordion-body">
+          <div class="dash-accordion-content table-wrap">
+            <table style="margin:0;">
+              <thead><tr><th>Product Name</th><th>Batch Number</th><th>Quantity</th></tr></thead>
+              <tbody id="do-prod-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Trim Overview -->
+      <div class="dash-accordion" id="acc-trims">
+        <div class="dash-accordion-header" onclick="toggleDashboardAccordion('acc-trims')">
+          <div class="dash-accordion-title">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.121 14.121L19 19m-7-7l7-7m-7 7l-2.879 2.879M12 12L9.121 9.121m0 5.758a3 3 0 10-4.243 4.243 3 3 0 004.243-4.243zm0-5.758a3 3 0 10-4.243-4.243 3 3 0 004.243 4.243z"/></svg>
+            Trim Overview
+          </div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span class="dash-accordion-stat" id="do-trim-total">—</span>
+            <svg class="dash-accordion-chevron" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </div>
+        <div class="dash-accordion-body">
+          <div class="dash-accordion-content table-wrap">
+            <table style="margin:0;">
+              <thead><tr><th>Name</th><th>Quantity</th></tr></thead>
+              <tbody id="do-trim-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Fabric Overview -->
+      <div class="dash-accordion" id="acc-fabrics">
+        <div class="dash-accordion-header" onclick="toggleDashboardAccordion('acc-fabrics')">
+          <div class="dash-accordion-title">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+            Fabric Overview
+          </div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span class="dash-accordion-stat" id="do-fab-total">—</span>
+            <svg class="dash-accordion-chevron" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </div>
+        <div class="dash-accordion-body">
+          <div class="dash-accordion-content table-wrap">
+            <table style="margin:0;">
+              <thead><tr><th>Name</th><th>Quantity</th></tr></thead>
+              <tbody id="do-fab-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Monthly Summary -->
+      <div class="dash-accordion" id="acc-month">
+        <div class="dash-accordion-header" onclick="toggleDashboardAccordion('acc-month')">
+          <div class="dash-accordion-title">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            Monthly Summary
+          </div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span style="font-size:14px; font-weight:600; color:var(--muted);" id="do-month-label">This Month</span>
+            <svg class="dash-accordion-chevron" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </div>
+        </div>
+        <div class="dash-accordion-body">
+          <div class="dash-accordion-content" style="display:flex; gap:24px; padding:24px;">
+            <div style="flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:20px; text-align:center;">
+              <div style="font-size:14px; color:var(--muted); font-weight:600; margin-bottom:8px;">Products Produced</div>
+              <div style="font-size:32px; font-weight:700; color:var(--primary);" id="do-month-prod">—</div>
+            </div>
+            <div style="flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:20px; text-align:center;">
+              <div style="font-size:14px; color:var(--muted); font-weight:600; margin-bottom:8px;">Trims Consumed</div>
+              <div style="font-size:32px; font-weight:700; color:var(--text);" id="do-month-trim">—</div>
+            </div>
+            <div style="flex:1; background:var(--bg); border:1px solid var(--border); border-radius:8px; padding:20px; text-align:center;">
+              <div style="font-size:14px; color:var(--muted); font-weight:600; margin-bottom:8px;">Fabrics Consumed</div>
+              <div style="font-size:32px; font-weight:700; color:var(--text);" id="do-month-fab">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== MATERIAL LIST (MASTER DATA) PAGE ===== -->
+    <div class="page" id="page-inventory">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">Material Master List</span>
+          <div class="filter-bar">
+            <input type="text" id="invSearch" class="search-input" placeholder="Search by name or code..." onkeyup="renderInventory()">
+            <select id="invCatFilter" onchange="renderInventory()">
+              <option value="all">All Types</option>
+              <option value="Products">Products</option>
+              <option value="Trim">Trims</option>
+              <option value="Fabric">Fabrics</option>
+              <option value="Others">Others</option>
+            </select>
+            <button class="btn btn-primary" onclick="openAddModal()">
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Add Material
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Material Details</th><th>Type</th><th class="admin-only">Unit Cost</th><th>Stock Limit</th><th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="invTbody"><tr><td colspan="4"><div class="empty-state"><p>Loading…</p></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== PRODUCTS (STOCK) PAGE ===== -->
+    <div class="page" id="page-products" style="width:100%; max-width:900px; margin: 0 auto; padding-top:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+        <h2 style="margin-bottom:0; color:var(--text);">Products in Stock</h2>
+      </div>
+      <div id="productsAccordionContainer"></div>
+    </div>
+
+    <!-- ===== PRODUCTION (BATCHES) PAGE ===== -->
+    <div class="page" id="page-production" style="max-width:960px; margin:0 auto; padding-top:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+        <h2 style="margin-bottom:0; color:var(--text);">Production Report</h2>
+        <button class="btn btn-primary" onclick="openProductionModal()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> New Production Entry
+        </button>
+      </div>
+      <div id="batchAccordionContainer"></div>
+    </div>
+
+
+    <!-- ===== REPORTS PAGE ===== -->
+    <div class="page" id="page-reports">
+      <div class="card">
+        <div class="card-header" style="flex-direction:column; align-items:flex-start; gap:16px;">
+          <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+            <span class="card-title">Reports</span>
+            <div class="filter-bar">
+              <label style="font-size:14px; font-weight:600; color:var(--muted);">Filter by Month:</label>
+              <input type="month" id="reportMonthFilter" class="search-input" style="padding:6px 12px; border:1px solid var(--border); border-radius:4px;" onchange="renderReports()">
+            </div>
+          </div>
+          
+          <div class="reports-tabs" style="display:flex; gap:16px; border-bottom:1px solid var(--border); width:100%; background:var(--dark); padding:10px 20px; border-radius:12px 12px 0 0;">
+            <button class="tab-btn active" style="background:none; border:none; padding-bottom:8px; border-bottom:2px solid var(--primary); font-weight:600; cursor:pointer; color:white;" onclick="switchReportTab('monthly', this)">Monthly Report</button>
+            <button class="tab-btn" style="background:none; border:none; padding-bottom:8px; border-bottom:2px solid transparent; font-weight:600; cursor:pointer; color:white;" onclick="switchReportTab('product', this)">Product List</button>
+            <button class="tab-btn" style="background:none; border:none; padding-bottom:8px; border-bottom:2px solid transparent; font-weight:600; cursor:pointer; color:white;" onclick="switchReportTab('trim', this)">Trim Report</button>
+            <button class="tab-btn" style="background:none; border:none; padding-bottom:8px; border-bottom:2px solid transparent; font-weight:600; cursor:pointer; color:white;" onclick="switchReportTab('fabric', this)">Fabric Report</button>
+            <button class="tab-btn" style="background:none; border:none; padding-bottom:8px; border-bottom:2px solid transparent; font-weight:600; cursor:pointer; color:white;" onclick="switchReportTab('production', this)">Production Report</button>
+          </div>
+        </div>
+
+        <div class="card-body" style="padding:24px;">
+          <!-- Monthly Report Content -->
+          <div id="rep-monthly" class="report-tab-content" style="display:block;">
+            <div style="margin-bottom:24px;">
+              <h4 style="margin-bottom:12px; font-size:16px; color:var(--text);">Monthly Summary</h4>
+              <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="stat-card" style="padding:16px;">
+                  <div class="stat-title">Products Produced</div>
+                  <div class="stat-value" id="rm-prod-qty">—</div>
+                </div>
+                <div class="stat-card" style="padding:16px;">
+                  <div class="stat-title">Trims Consumed</div>
+                  <div class="stat-value" id="rm-trim-qty">—</div>
+                </div>
+                <div class="stat-card" style="padding:16px;">
+                  <div class="stat-title">Fabrics Consumed</div>
+                  <div class="stat-value" id="rm-fab-qty">—</div>
+                </div>
+              </div>
+            </div>
+            
+            <h4 style="margin-bottom:12px; font-size:16px; color:var(--text);">Low Stock Overview</h4>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Item Name</th><th>Category</th><th>Current Qty</th><th>Threshold</th><th>Alert</th></tr></thead>
+                <tbody id="rm-lowstock-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Product Report Content -->
+          <div id="rep-product" class="report-tab-content" style="display:none;">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Batch Number</th><th>Product Name</th><th>Produced Quantity</th><th>Date</th></tr></thead>
+                <tbody id="rep-product-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Trim Report Content -->
+          <div id="rep-trim" class="report-tab-content" style="display:none;">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Trim Name</th><th>Current Quantity</th><th>Threshold</th><th>Stock Alert</th></tr></thead>
+                <tbody id="rep-trim-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Fabric Report Content -->
+          <div id="rep-fabric" class="report-tab-content" style="display:none;">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Fabric Name</th><th>Current Quantity</th><th>Threshold</th><th>Stock Alert</th></tr></thead>
+                <tbody id="rep-fabric-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Production Report Content -->
+          <div id="rep-production" class="report-tab-content" style="display:none;">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Batch #</th><th>Product</th><th>Produced Qty</th><th>Total Duration</th><th>Stage Details</th></tr></thead>
+                <tbody id="rep-production-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== TRIMS PAGE ===== -->
+    <div class="page" id="page-trims" style="width:100%; max-width:900px; margin: 0 auto; padding-top:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+        <h2 style="margin-bottom:0; color:var(--text);">Trim Inventory</h2>
+        <button class="btn btn-primary" onclick="openTrimCreationModal()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> Add New Trim
+        </button>
+      </div>
+      <div id="trimsAccordionContainer"></div>
+    </div>
+
+    <!-- ===== FABRICS PAGE ===== -->
+    <div class="page" id="page-fabrics" style="width:100%; max-width:900px; margin: 0 auto; padding-top:16px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+        <h2 style="margin-bottom:0; color:var(--text);">Fabric Inventory</h2>
+        <button class="btn btn-primary" onclick="openFabricCreationModal()">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg> Add New Fabric
+        </button>
+      </div>
+      <div id="fabricsAccordionContainer"></div>
+    </div>
+
+
+
+    <!-- ===== USERS PAGE (Admin only) ===== -->
+    <div class="page" id="page-users">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">User Management</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>User</th><th>Role</th><th>Action</th></tr></thead>
+            <tbody id="usersTbody"><tr><td colspan="3"><div class="empty-state"><p>Loading…</p></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== SECURITY LOG PAGE (Admin only) ===== -->
+    <div class="page" id="page-seclog">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">📜 Activity Logs</span>
+          <span style="font-size:13px;color:var(--muted);">Most recent events first</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Timestamp</th><th>Event</th><th>User</th><th>Details</th></tr></thead>
+            <tbody id="logTbody"><tr><td colspan="4"><div class="empty-state"><p>Loading…</p></div></td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
+
+<!-- ===== ADD / EDIT MODAL ===== -->
+<div class="modal-overlay" id="itemModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="modalTitle">Add New Item</h3>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="itemForm" onsubmit="event.preventDefault(); saveItem();">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-name">Item Name *</label>
+            <input type="text" id="f-name" placeholder="e.g. Classic Tote Bag" required maxlength="200"/>
+          </div>
+          <div class="form-group">
+            <label for="f-sku">SKU * <span style="font-size:11px;color:var(--muted);">(letters, numbers, hyphens)</span></label>
+            <input type="text" id="f-sku" placeholder="e.g. NB-TOT-001" required maxlength="40"/>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-category">Category</label>
+            <select id="f-category">
+              <option value="Products">Products</option>
+              <option value="Trim">Raw Material — Trim</option>
+              <option value="Fabric">Raw Material — Fabric</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="f-unit">Unit *</label>
+            <select id="f-unit" required>
+              <option value="" disabled selected>Select unit...</option>
+              <option value="pcs">pcs</option>
+              <option value="meters">meters</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-unit-cost">Unit Cost (ETB)</label>
+            <input type="number" id="f-unit-cost" step="0.01" min="0" placeholder="0.00"/>
+          </div>
+          <div class="form-group">
+            <label for="f-threshold">Low Stock Threshold</label>
+            <input type="number" id="f-threshold" min="0" max="999999" placeholder="Alert when qty ≤ this"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="f-notes">Notes</label>
+          <textarea id="f-notes" placeholder="Optional notes…" maxlength="500"></textarea>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveItem()">Save Item</button>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ===== FABRIC MODAL ===== -->
+<div class="modal-overlay" id="fabricModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 id="fabricModalTitle">Add New Fabric</h3>
+      <button class="modal-close" onclick="closeFabricModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="fabricForm" onsubmit="event.preventDefault(); saveFabric();">
+        <div class="form-group">
+          <label for="f-fab-name">Fabric Item</label>
+          <select id="f-fab-name" required>
+            <option value="" disabled selected>Select a fabric item...</option>
+            <optgroup label="Outer Fabric">
+              <option value="FCA-001 PVC Canvas">FCA-001 PVC Canvas</option>
+              <option value="FCA-002 Heavy Cotton Canvas">FCA-002 Heavy Cotton Canvas</option>
+              <option value="FCA-003 Light Cotton Canvas">FCA-003 Light Cotton Canvas</option>
+              <option value="FCA-004 Synthetic Leather">FCA-004 Synthetic Leather</option>
+              <option value="FCA-005 Printed Fabric">FCA-005 Printed Fabric</option>
+            </optgroup>
+            <optgroup label="Lining">
+              <option value="FCB-001 Heavy Tafeta">FCB-001 Heavy Tafeta</option>
+              <option value="FCB-002 Twil Lining">FCB-002 Twil Lining</option>
+              <option value="FCB-003 Aluminum Lining">FCB-003 Aluminum Lining</option>
+            </optgroup>
+            <optgroup label="Interlining">
+              <option value="FCC-001 White Foam">FCC-001 White Foam</option>
+              <option value="FCC-002 Grey Foam">FCC-002 Grey Foam</option>
+              <option value="FCC-003 Pearl Cotton Foam 3mm">FCC-003 Pearl Cotton Foam 3mm</option>
+              <option value="FCC-004 White Iron Interfacing">FCC-004 White Iron Interfacing</option>
+              <option value="FCC-005 Black Iron Interfacing">FCC-005 Black Iron Interfacing</option>
+              <option value="FCC-006 Pearl Cotton Foam 5mm">FCC-006 Pearl Cotton Foam 5mm</option>
+              <option value="FCC-007 Pearl Cotton Foam 10mm">FCC-007 Pearl Cotton Foam 10mm</option>
+            </optgroup>
+            <optgroup label="Miscellaneous">
+              <option value="FCD-001 Polyester Mesh">FCD-001 Polyester Mesh</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="f-fab-consumption">Consumption</label>
+            <input type="number" step="0.01" min="0.01" id="f-fab-consumption" required />
+          </div>
+          <div class="form-group">
+            <label for="f-fab-cost">Unit Cost (ETB)</label>
+            <input type="number" step="0.01" min="0" id="f-fab-cost" required />
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeFabricModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFabric()">Save Fabric</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BATCH CREATION MODAL ===== -->
+<div class="modal-overlay" id="batchModal">
+  <div class="modal" style="width: 800px; max-width: 95%;">
+    <div class="modal-header">
+      <h3>Create Production Batch</h3>
+      <button class="modal-close" onclick="closeBatchModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <form id="batchForm" onsubmit="event.preventDefault(); saveBatch();">
+        
+        <h4 style="margin-bottom:12px;">Product Details</h4>
+        <div class="form-row">
+          <div class="form-group" style="flex:2;">
+            <label>Product Name</label>
+            <select id="b-product-id" required>
+              <option value="" disabled selected>Select a Product...</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label>Produced Qty</label>
+            <input type="number" min="1" id="b-produced-qty" required />
+          </div>
+        </div>
+
+        <h4 style="margin-top:20px; margin-bottom:12px;">Materials Used</h4>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fabric</label>
+            <select id="b-fabric-id" required>
+              <option value="" disabled selected>Select Fabric...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Consumed Qty (Meters)</label>
+            <input type="number" step="0.01" min="0.01" id="b-fabric-qty" required />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Trim</label>
+            <select id="b-trim-id" required>
+              <option value="" disabled selected>Select Trim...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Consumed Qty (Amount)</label>
+            <input type="number" step="0.01" min="0.01" id="b-trim-qty" required />
+          </div>
+        </div>
+
+        <h4 style="margin-top:20px; margin-bottom:12px;">Production Stages</h4>
+        <p style="font-size:12px; color:var(--muted); margin-bottom:10px;">Specify start and end dates for the following stages:</p>
+        
+        <div class="form-row">
+          <div class="form-group"><label>Trim Prep - Start</label><input type="date" id="b-stage1-start" required/></div>
+          <div class="form-group"><label>End</label><input type="date" id="b-stage1-end" required/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Fabric Cut - Start</label><input type="date" id="b-stage2-start" required/></div>
+          <div class="form-group"><label>End</label><input type="date" id="b-stage2-end" required/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Print Prep - Start</label><input type="date" id="b-stage3-start" required/></div>
+          <div class="form-group"><label>End</label><input type="date" id="b-stage3-end" required/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Sewing - Start</label><input type="date" id="b-stage4-start" required/></div>
+          <div class="form-group"><label>End</label><input type="date" id="b-stage4-end" required/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Finishing & QC - Start</label><input type="date" id="b-stage5-start" required/></div>
+          <div class="form-group"><label>End</label><input type="date" id="b-stage5-end" required/></div>
+        </div>
+
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeBatchModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBatch()">Complete Batch</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DELETE ITEM CONFIRM ===== -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+    </div>
+    <h4>Delete Item?</h4>
+    <p>Are you sure you want to delete <strong id="confirmItemName"></strong>? This cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" onclick="cancelDelete()">Cancel</button>
+      <button class="btn btn-danger" onclick="executeDelete()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DELETE USER CONFIRM ===== -->
+<div class="confirm-overlay" id="confirmUserOverlay">
+  <div class="confirm-box">
+    <div class="confirm-icon">
+      <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7a4 4 0 11-8 0 4 4 0 018 0zM9 14a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6zM21 12h-6"/></svg>
+    </div>
+    <h4>Delete User?</h4>
+    <p>Are you sure you want to delete <strong id="confirmUserName"></strong>? They will lose all access.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-secondary" onclick="cancelDeleteUser()">Cancel</button>
+      <button class="btn btn-danger" onclick="executeDeleteUser()">Yes, Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== ADJUST STOCK MODAL ===== -->
+<div class="modal-overlay" id="adjustModal">
+  <div class="modal" style="max-width: 440px;">
+    <div class="modal-header">
+      <h3>Adjust Stock: <span id="adjItemName" style="color:var(--accent);"></span></h3>
+      <button class="modal-close" onclick="closeAdjustModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:var(--bg); padding:12px; border-radius:8px; margin-bottom:20px; font-size:13px;">
+        <span style="color:var(--muted);">Current Quantity: </span>
+        <strong id="adjCurrentQty" style="font-size:16px;"></strong>
+      </div>
+      <form id="adjustForm" onsubmit="event.preventDefault(); saveAdjustment();">
+        <div class="form-row">
+          <div class="form-group" style="flex:0.6;">
+            <label for="f-adj-type">Type</label>
+            <select id="f-adj-type">
+              <option value="add">Stock In (+)</option>
+              <option value="remove">Stock Out (-)</option>
+            </select>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="f-adj-qty">Amount</label>
+            <input type="number" id="f-adj-qty" min="1" max="999999" placeholder="Enter amount..." required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="f-adj-note">Reason / Note <span style="font-size:11px;color:var(--muted);">(Required)</span></label>
+          <input type="text" id="f-adj-note" placeholder="e.g. Production, Sold, Restock, Damaged..." required maxlength="100"/>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeAdjustModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveAdjustment()">Confirm Adjustment</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRODUCTION MODAL ===== -->
+<div class="modal-overlay" id="productionModal">
+  <div class="modal" style="max-width:760px; width:95%; max-height:90vh; overflow-y:auto;">
+    <div class="modal-header">
+      <h3>New Production Entry</h3>
+      <button class="modal-close" onclick="closeProductionModal()">×</button>
+    </div>
+    <div style="padding:24px; display:flex; flex-direction:column; gap:24px;">
+
+      <!-- Section A: Production Info -->
+      <div>
+        <h4 style="margin-bottom:12px; font-size:14px; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.5px;">📦 Production Info</h4>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group" style="margin:0;">
+            <label for="prod-product">Product</label>
+            <select id="prod-product" required style="padding:10px; border:1px solid var(--border); border-radius:var(--radius); font-family:inherit; width:100%; background:var(--surface);">
+              <option value="" disabled selected>Select a product...</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0;">
+            <label for="prod-qty">Quantity Produced</label>
+            <input type="number" id="prod-qty" min="1" placeholder="e.g. 10">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section B: Trim Usage -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="font-size:14px; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.5px;">🧵 Trim Usage</h4>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addProductionTrimRow()">+ Add Trim</button>
+        </div>
+        <div id="prod-trim-rows">
+          <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr 30px; gap:8px; padding:0 0 8px 0; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;">
+            <div>Type/color</div><div>Quantity</div><div>Unit Cost</div><div>Total</div><div></div>
+          </div>
+          <div style="font-size:13px; color:var(--muted); padding:8px 0;">Click "+ Add Trim" to log trim usage.</div>
+        </div>
+      </div>
+
+      <!-- Section C: Fabric Usage -->
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <h4 style="font-size:14px; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.5px;">🧵 Fabric Usage</h4>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="addProductionFabricRow()">+ Add Fabric</button>
+        </div>
+        <div id="prod-fabric-rows">
+          <div style="display:grid; grid-template-columns: 2fr 1fr 1fr 1fr 30px; gap:8px; padding:0 0 8px 0; font-size:11px; font-weight:700; color:var(--muted); text-transform:uppercase;">
+            <div>Type/color</div><div>Quantity</div><div>Unit Cost</div><div>Total</div><div></div>
+          </div>
+          <div style="font-size:13px; color:var(--muted); padding:8px 0;">Click "+ Add Fabric" to log fabric usage.</div>
+        </div>
+      </div>
+
+      <!-- Section D: Production Stages -->
+      <div>
+        <h4 style="margin-bottom:12px; font-size:14px; font-weight:700; text-transform:uppercase; color:var(--muted); letter-spacing:.5px;">🏭 Production Stages</h4>
+        <div style="display:flex; flex-direction:column; gap:10px;" id="prod-stages-container">
+          <!-- Rendered by JS -->
+        </div>
+      </div>
+
+      <!-- Section E: Summary -->
+      <div style="background:var(--accent-light); border-radius:8px; padding:16px;">
+        <h4 style="margin-bottom:8px; font-size:13px; font-weight:700; text-transform:uppercase; color:var(--accent);">Summary</h4>
+        <div style="display:flex; gap:32px;">
+          <div>
+            <div style="font-size:12px; color:var(--muted);">Total Duration</div>
+            <div id="prod-summary-duration" style="font-weight:700; font-size:16px;">—</div>
+          </div>
+          <div>
+            <div style="font-size:12px; color:var(--muted);">Total Produced Quantity</div>
+            <div id="prod-summary-qty" style="font-weight:700; font-size:16px;">—</div>
+          </div>
+          <div id="prod-summary-cost-container" style="display:none;">
+            <div style="font-size:12px; color:var(--muted);">Total Material Cost</div>
+            <div id="prod-summary-cost" style="font-weight:700; font-size:16px; color:var(--danger);">0.00 ETB</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeProductionModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="saveProduction()">Save Production Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast-container" id="toastContainer"></div>
+
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="app.js?v=202605021"></script>
+<script>
+  document.getElementById('topbarDate').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+  const _navTo = navigateTo;
+  const pageTitles = {
+    overview:  ['Overview',      'Summary of your inventory'],
+    inventory: ['Inventory',     'Manage all stock items'],
+    movements: ['Stock Movements','Log of stock in and out'],
+    reports:   ['Reports',       'Analytics & insights'],
+    users:     ['User Management','Admin only — manage user accounts'],
+    seclog:    ['Security Log',  'Admin only — audit trail'],
+    trims:     ['Trim Inventory','Track units and cost of trims'],
+    fabrics:   ['Fabric Inventory','Track material consumption'],
+    production:['Production Stages', 'Manage and log independent workflow stages']
+  };
+  navigateTo = function(id) {
+    _navTo(id);
+    if (pageTitles[id]) {
+      document.getElementById('topbarTitle').textContent = pageTitles[id][0];
+      document.getElementById('topbarSub').textContent   = pageTitles[id][1];
+    }
+  };
+
+  if (requireAuth()) {
+    fetchAllData().then(() => {
+      const user = getSession();
+      if (user) {
+          document.getElementById('userName').textContent = user.name || user.username;
+          document.getElementById('userRole').textContent = user.role;
+          document.getElementById('userAvatarText').textContent = (user.name || user.username).charAt(0).toUpperCase();
+          if (user.role !== 'admin') {
+              document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+          }
+      }
+      navigateTo('overview');
+      setupSessionTimers();
+      initTheme();
+      initDashboard();
+    }).catch(err => {
+      console.error('Initial load failed', err);
+      showToast('Failed to load data. Please refresh.', 'error');
+    });
+  }
+</script>
+</body>
+</html>

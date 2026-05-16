@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NURU Bags — Admin Setup</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="brand">NURU<span>.</span></div>
+        <p>Admin Recovery & Setup</p>
+      </div>
+
+      <h2>Create Root Admin</h2>
+      <p class="subtitle">This option is only available if no admin exists.</p>
+
+      <div class="login-error" id="setupError"></div>
+
+      <form id="setupForm" autocomplete="off">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="Your Name" required />
+        </div>
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Choose admin username" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Choose admin password" required />
+        </div>
+        <button type="submit" class="btn btn-primary btn-block">Create Admin Account</button>
+      </form>
+
+      <p style="text-align:center; margin-top:22px; font-size:14px; color:var(--muted);">
+        <a href="index.html" style="color:var(--accent); font-weight:600; text-decoration:none;">← Back to Login</a>
+      </p>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('setupForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const errBox = document.getElementById('setupError');
+      errBox.classList.remove('show');
+
+      const name = document.getElementById('name').value;
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const res = await fetch('/api/auth/setup-admin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, username, password })
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          alert('Admin account created successfully! Redirecting to login...');
+          window.location.href = 'index.html';
+        } else {
+          throw new Error(data.error || 'Failed to create admin');
+        }
+      } catch (err) {
+        errBox.textContent = err.message;
+        errBox.classList.add('show');
+      }
+    });
+  </script>
+</body>
+</html>
