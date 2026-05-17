@@ -48,7 +48,7 @@ async function initDb() {
             ts TEXT,
             event TEXT,
             detail TEXT,
-            user_name TEXT
+            "user" TEXT
         )`);
 
         // Trim Table

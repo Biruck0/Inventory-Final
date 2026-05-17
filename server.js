@@ -36,7 +36,7 @@ const requireAdmin = async (req, res, next) => {
     } else {
         const ts = new Date().toISOString();
         const user = req.user ? req.user.username : 'anonymous';
-        await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', 
+        await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', 
             [ts, 'AUTH_FAIL', `Rejected admin access to: ${req.originalUrl}`, user]);
         return res.status(403).json({ error: 'Admins only' });
     }
@@ -50,14 +50,14 @@ app.post('/api/auth/login', async (req, res) => {
         const user = await db.get('SELECT * FROM users WHERE username = ?', [username.toLowerCase()]);
         
         if (!user) {
-            await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', 
+            await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', 
                 [ts, 'LOGIN_FAIL', `Non-existent user: ${username}`, 'system']);
             return res.status(401).json({ error: 'Invalid credentials' });
         }
         
         const validPassword = await bcrypt.compare(password, user.hash);
         if (!validPassword) {
-            await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', 
+            await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', 
                 [ts, 'LOGIN_FAIL', `Incorrect password for: ${username}`, username]);
             return res.status(401).json({ error: 'Invalid credentials' });
         }
@@ -65,7 +65,7 @@ app.post('/api/auth/login', async (req, res) => {
         const tokenUser = { id: user.id, username: user.username, role: user.role, name: user.name, initials: user.initials };
         const token = jwt.sign(tokenUser, JWT_SECRET, { expiresIn: '12h' });
         
-        await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', 
+        await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', 
             [ts, 'LOGIN_SUCCESS', `User signed in: ${username}`, username]);
             
         res.json({ token, user: tokenUser });
@@ -93,7 +93,7 @@ app.post('/api/auth/register', async (req, res) => {
         
         await db.run('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)', [id, name, username.toLowerCase(), hash, role, initials]);
         
-        await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', 
+        await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', 
             [ts, 'USER_REGISTER', `New user registered: ${username}`, username]);
 
         const tokenUser = { id, username: username.toLowerCase(), role, name, initials };
@@ -112,9 +112,9 @@ app.post('/api/auth/setup-admin', async (req, res) => {
         const ts = new Date().toISOString();
 
         // Check if ANY admin exists
-        const adminExists = await db.get('SELECT id FROM users WHERE role = "admin"');
+        const adminExists = await db.get('SELECT id FROM users WHERE role = \'admin\'');
         if (adminExists) {
-            await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', 
+            await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', 
                 [ts, 'AUTH_FAIL', 'Blocked setup-admin attempt (admin already exists)', 'system']);
             return res.status(403).json({ error: 'Admin account already exists' });
         }
@@ -125,7 +125,7 @@ app.post('/api/auth/setup-admin', async (req, res) => {
         
         await db.run('INSERT INTO users VALUES (?, ?, ?, ?, ?, ?)', [id, name, username.toLowerCase(), hash, 'admin', initials]);
         
-        await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', 
+        await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', 
             [ts, 'ADMIN_CREATED', `Root admin created: ${username}`, username]);
 
         res.json({ success: true, message: 'Admin account created successfully' });
@@ -218,7 +218,7 @@ app.post('/api/items/stock', authenticateToken, async (req, res) => {
         const user = req.user ? req.user.username : 'anonymous';
         const detail = `${type === 'in' ? 'Added' : 'Subtracted'} ${amount} for ${item.name}. ${notes || ''}`;
         
-        await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', [ts, 'STOCK_ADJUST', detail, user]);
+        await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', [ts, 'STOCK_ADJUST', detail, user]);
         res.json({ success: true });
     } catch (err) {
         console.error(err);
@@ -247,7 +247,7 @@ app.put('/api/users/:id/role', authenticateToken, requireAdmin, async (req, res)
 
         await db.run('UPDATE users SET role = ? WHERE id = ?', [role, req.params.id]);
         
-        await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', 
+        await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', 
             [ts, 'ROLE_CHANGE', `Role of ${targetUser.username} changed to ${role} by admin`, adminUser]);
             
         res.json({ success: true });
@@ -264,7 +264,7 @@ app.delete('/api/users/:id', authenticateToken, requireAdmin, async (req, res) =
         await db.run('DELETE FROM users WHERE id=?', [req.params.id]);
         
         if (targetUser) {
-            await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', 
+            await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', 
                 [ts, 'USER_DELETE', `Deleted user: ${targetUser.username}`, req.user.username]);
         }
         
@@ -276,7 +276,7 @@ app.delete('/api/users/:id', authenticateToken, requireAdmin, async (req, res) =
 
 app.get('/api/audit', authenticateToken, requireAdmin, async (req, res) => {
     try {
-        const logs = await db.all('SELECT * FROM audit WHERE event != "STOCK_ADJUST" ORDER BY ts DESC LIMIT 500');
+        const logs = await db.all('SELECT * FROM audit WHERE event != \'STOCK_ADJUST\' ORDER BY ts DESC LIMIT 500');
         res.json(logs);
     } catch (err) {
         res.status(500).json({ error: 'Internal error' });
@@ -285,7 +285,7 @@ app.get('/api/audit', authenticateToken, requireAdmin, async (req, res) => {
 
 app.get('/api/stock-movements', authenticateToken, async (req, res) => {
     try {
-        const logs = await db.all('SELECT * FROM audit WHERE event = "STOCK_ADJUST" ORDER BY ts DESC LIMIT 500');
+        const logs = await db.all('SELECT * FROM audit WHERE event = \'STOCK_ADJUST\' ORDER BY ts DESC LIMIT 500');
         res.json(logs);
     } catch (err) {
         res.status(500).json({ error: 'Internal error' });
@@ -297,7 +297,7 @@ app.post('/api/audit', authenticateToken, async (req, res) => {
         const { event, detail } = req.body;
         const ts = new Date().toISOString();
         const user = req.user ? req.user.username : 'anonymous';
-        await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', [ts, event, detail, user]);
+        await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', [ts, event, detail, user]);
         res.json({ success: true });
     } catch (err) {
         res.status(500).json({ error: 'Internal error' });
@@ -438,7 +438,7 @@ app.post('/api/batches', authenticateToken, async (req, res) => {
             const matItem = await db.get('SELECT name FROM items WHERE id = ?', [m.material_id]);
             const matName = matItem ? matItem.name : m.material_id;
             const moduleName = m.type === 'trim' ? 'Trim' : 'Fabric';
-            await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)',
+            await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)',
                 [created_at, `Output | ${moduleName}`,
                  `Consumed ${m.consumed_qty} of ${matName} for Batch #${batch_number} (${productName})`,
                  user]);
@@ -452,7 +452,7 @@ app.post('/api/batches', authenticateToken, async (req, res) => {
         }
 
         // Log the overall batch creation
-        await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)',
+        await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)',
             [created_at, 'Entry | Production',
              `New Production Batch #${batch_number} created for ${productName} (Qty: ${produced_qty})`,
              user]);
@@ -490,7 +490,7 @@ app.post('/api/products/batch', authenticateToken, async (req, res) => {
         
         // Log the event
         const user = req.user ? req.user.username : 'anonymous';
-        await db.run('INSERT INTO audit (ts, event, detail, user) VALUES (?, ?, ?, ?)', [created_at, 'STOCK_ADJUST', `Added ${produced_qty} to ${productItem ? productItem.name : product_id} (Batch #${batch_number})`, user]);
+        await db.run('INSERT INTO audit (ts, event, detail, "user") VALUES (?, ?, ?, ?)', [created_at, 'STOCK_ADJUST', `Added ${produced_qty} to ${productItem ? productItem.name : product_id} (Batch #${batch_number})`, user]);
 
         res.json({ success: true, batch_number, batch_id });
     } catch (err) {
@@ -514,3 +514,5 @@ app.delete('/api/batches/:id', authenticateToken, async (req, res) => {
 app.listen(PORT, () => {
     console.log('Server is running on port ' + PORT);
 });
+
+module.exports = app;
