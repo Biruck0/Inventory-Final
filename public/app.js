@@ -649,14 +649,21 @@ async function initDashboard() {
   await fetchAllData();
   navigateTo('overview');
 }
+window.toggleMobileMenu = function() {
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (sidebar) sidebar.classList.toggle('open');
+  if (overlay) overlay.classList.toggle('open');
+};
 
 function navigateTo(pageId) {
   // Close mobile sidebar if open
   const sidebar = document.querySelector('.sidebar');
-  if (sidebar && sidebar.classList.contains('mobile-open')) {
-    sidebar.classList.remove('mobile-open');
+  const overlay = document.getElementById('sidebarOverlay');
+  if (sidebar && sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+    if (overlay) overlay.classList.remove('open');
   }
-
   // Role guard for admin-only pages
   if ((pageId === 'users' || pageId === 'seclog') && getSession()?.role !== 'admin') {
     auditLog('AUTH_FAIL', `Unauthorized access attempt to page: ${pageId}`);
